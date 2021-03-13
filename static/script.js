@@ -209,7 +209,7 @@ function loadAddDataFromAllUsers() {
         row.insertCell(1).innerHTML = addResult.num1;
         row.insertCell(2).innerHTML = addResult.num2;
         row.insertCell(3).innerHTML = addResult.result;
-        row.insertCell(4).innerHTML = "<a>modify=" + index + "</a>";
+        row.insertCell(4).innerHTML = "<button onclick='modifyOnElementByIndex(" + index + ")'>modify</button><input type='hidden' id='" + index + "'>";
         row.insertCell(5).innerHTML = "<button onclick='deleteElementByIndex(" + index + ")'>delete</button><input type='hidden' id='" + index + "'>";
         index++
     }
@@ -232,10 +232,33 @@ function deleteElementFromLocalStorage(pIndex) {
 
 function deleteElementFromTable(pIndex) {
     var element = document.getElementById(pIndex)
-    var parent = element.parentNode.parentNode.parentNode
-    var child = element.parentNode.parentNode
+    var parent = getElementParent(element, 3)
+    var child = getElementParent(element, 2)
     parent.removeChild(child)
 }
+
+function modifyOnElementByIndex(pIndex) {
+    var element = document.getElementById(pIndex)
+    var parent = getElementParent(element, 2)
+    console.log(parent.children)
+    var children = parent.children
+    children[1].innerHTML = "<input type='number' id='inpNum" + pIndex + "' value='" + children[1].innerText + "'>"
+    children[2].innerHTML = "<input type='number' id='inpNum" + pIndex + "' value='" + children[2].innerText + "'>"
+    children[4].innerHTML = "<button onclick='modifyOffElementByIndex(" + pIndex + ",1)'>save</button><button onclick='modifyOffElementByIndex(" + pIndex + ",0)'>modify off</button><input type='hidden' id='" + pIndex + "'>"
+}
+
+function modifyOffElementByIndex(pIndex, pSave) {
+
+}
+
+function getElementParent(pElement, pGen) {
+    var parent = pElement
+    for (var i = 0; i < pGen; i++) {
+        parent = parent.parentNode
+    }
+    return parent
+}
+
 
 /*
 ************* dashboard functionality add admin
