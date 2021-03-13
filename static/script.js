@@ -210,26 +210,17 @@ function loadAddDataFromAllUsers() {
         row.insertCell(2).innerHTML = addResult.num2;
         row.insertCell(3).innerHTML = addResult.result;
         row.insertCell(4).innerHTML = "<a>modify=" + index + "</a>";
-        var deleteRow = row.insertCell(5)
-        deleteRow.innerHTML = "<button onclick='deleteElementByIndex(" + index + ")'>delete</button>";
-        console.log(deleteRow.parentElement.parentElement)
+        row.insertCell(5).innerHTML = "<button onclick='deleteElementByIndex(" + index + ")'>delete</button><input type='hidden' id='" + index + "'>";
         index++
     }
 }
-
-/*
-function deleteRow(btn) {
-    var row = btn.parentNode.parentNode;
-    row.parentNode.removeChild(row);
-}        
-*/
-
 
 function deleteElementByIndex(pIndex) {
     //que es lo que implica eliminar un elemento?
     //1. quitarlo del local storage
     deleteElementFromLocalStorage(pIndex)
     //2. quitarlo de la tabla
+    deleteElementFromTable(pIndex)
 
 }
 
@@ -237,6 +228,13 @@ function deleteElementFromLocalStorage(pIndex) {
     var addResultArray = JSON.parse(localStorage.getItem("lAddResultArray"))
     addResultArray.splice(pIndex, 1)
     localStorage.setItem("lAddResultArray", JSON.stringify(addResultArray))
+}
+
+function deleteElementFromTable(pIndex) {
+    var element = document.getElementById(pIndex)
+    var parent = element.parentNode.parentNode.parentNode
+    var child = element.parentNode.parentNode
+    parent.removeChild(child)
 }
 
 /*
