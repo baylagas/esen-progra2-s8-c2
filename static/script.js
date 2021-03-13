@@ -67,7 +67,7 @@ function createSessionUser(user, password, role) {
 }
 
 /*
-************* login functionality end
+************* login functionality end 
 */
 
 
@@ -199,6 +199,8 @@ function loadAddDataFromAllUsers() {
 
     var userTableAdmin = document.getElementById("userTableAdmin")
     var row
+    var index = 0;
+    //var tableIndex = addResultArray
 
     for (var addResult of addResultArray) {
         row = userTableAdmin.insertRow(1)
@@ -207,9 +209,34 @@ function loadAddDataFromAllUsers() {
         row.insertCell(1).innerHTML = addResult.num1;
         row.insertCell(2).innerHTML = addResult.num2;
         row.insertCell(3).innerHTML = addResult.result;
-        row.insertCell(4).innerHTML = "<a>modify</a>";
-        row.insertCell(5).innerHTML = "<a>delete</a>";
+        row.insertCell(4).innerHTML = "<a>modify=" + index + "</a>";
+        var deleteRow = row.insertCell(5)
+        deleteRow.innerHTML = "<button onclick='deleteElementByIndex(" + index + ")'>delete</button>";
+        console.log(deleteRow.parentElement.parentElement)
+        index++
     }
+}
+
+/*
+function deleteRow(btn) {
+    var row = btn.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+}        
+*/
+
+
+function deleteElementByIndex(pIndex) {
+    //que es lo que implica eliminar un elemento?
+    //1. quitarlo del local storage
+    deleteElementFromLocalStorage(pIndex)
+    //2. quitarlo de la tabla
+
+}
+
+function deleteElementFromLocalStorage(pIndex) {
+    var addResultArray = JSON.parse(localStorage.getItem("lAddResultArray"))
+    addResultArray.splice(pIndex, 1)
+    localStorage.setItem("lAddResultArray", JSON.stringify(addResultArray))
 }
 
 /*
@@ -220,6 +247,41 @@ function loadAddDataFromAllUsers() {
 /*
 ************* dashboard functionality add client
 */
+if (window.location.href.includes("dashboard")) {
+    var currentLoggedUser = getCurrentLoggedUser()
+    var currentUser = currentLoggedUser.user
+    if (currentLoggedUser.role === "client") {
+
+        const elementToObserve = document.getElementById("client")
+
+        const observer = new MutationObserver(function () {
+            loadAddDataByUser(currentUser)
+            observer.disconnect()
+        });
+
+        observer.observe(elementToObserve, { subtree: true, childList: true });
+    }
+}
+
+function loadAddDataByUser(pCurrentUser) {
+    var addResultArray
+    if (localStorage.getItem("lAddResultArray") !== null) {
+        addResultArray = JSON.parse(localStorage.getItem("lAddResultArray"));
+    }
+
+    var userTableClient = document.getElementById("userTableClient")
+    var row
+
+    for (var addResult of addResultArray) {
+        if (addResult.user === pCurrentUser) {
+            row = userTableClient.insertRow(1)
+
+            row.insertCell(0).innerHTML = addResult.num1;
+            row.insertCell(1).innerHTML = addResult.num2;
+            row.insertCell(2).innerHTML = addResult.result;
+        }
+    }
+}
 
 function add() {
     var num1 = parseInt(document.getElementById("number1").value)
@@ -247,14 +309,18 @@ function addResultToTable(pNum1, pNum2, pResult) {
 }
 
 function addResultToStorage(pNum1, pNum2, pResult) {
-    var addResultArray = [];
+    var addResultArray = []
+
+    //obtener el current logged user
+    var currentLoggedUser = getCurrentLoggedUser()
+    //console.log(currentLoggedUser.user)
 
     if (localStorage.getItem("lAddResultArray") !== null) {
         addResultArray = JSON.parse(localStorage.getItem("lAddResultArray"));
     }
 
     var current_add_result = {
-        user: "test",
+        user: currentLoggedUser.user,
         num1: pNum1,
         num2: pNum2,
         result: pResult
